@@ -1,9 +1,12 @@
+#include <LiquidCrystal_I2C.h>
+
 /*  @XaviAlvarez
  *  Este sketch es un traductor de texto (introducido via serial) a código morse.
  *        1) Convierte los carácteres ASCII del puerto serie a código morse (que se interpreta por la iluminación de un led)
  *        2) Interpreta las pulsaciones y hace el proceso inverso (lo convierte a carácteres ASCII)
  */
- 
+
+LiquidCrystal_I2C lcd(0x27,16,2);
 const int PUNT = 1;         
 const int RAYA = 2;              
 const int PAUSA = 0;  
@@ -173,6 +176,9 @@ void mostrarLletra(byte lletra) {
 }
 
 void setup() {
+  lcd.begin();
+  lcd.backlight();
+  lcd.home();
   pinMode(LED, OUTPUT);                  // LED
   pinMode(BOTO, INPUT);                // Polsador
   digitalWrite(LED, LOW);                // Apaga LED
@@ -190,6 +196,7 @@ void loop() {
       duracioAnterior = duracioActual; // obté la duració total entre pulsacions
       if (duracioTotal > SALT_LLETRA) { // si es major al salt entre lletres (600ms) es un salt entre paraules
         Serial.print(' ');
+        lcd.print(' ');
       }
     } 
   } else { // if Pulsador = OFF
@@ -207,6 +214,7 @@ void loop() {
       if (senyalEntradaIndex > 0) { // si hi ha dades en el buffer de senyals
         if (duracioTotal > SALT || senyalEntradaIndex >= 4) { // si tenim una lletra
           Serial.print(senyalEntradaALletra()); // envia lletra via serial
+          lcd.print(senyalEntradaALletra());
           resetSenyalEntrada();
         }
       }
